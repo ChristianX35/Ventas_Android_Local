@@ -2,6 +2,17 @@
 
 Aplicación Android para apoyar la operación diaria de una tienda local. Permite registrar productos, mantener el stock al día y guardar las ventas realizadas durante cada jornada.
 
+> **En una frase:** una herramienta móvil para que una tienda lleve inventario y ventas desde Android, usando un único registro compartido en Firebase.
+
+## Comienza aquí
+
+| Si quieres… | Ve a… |
+| --- | --- |
+| Entender las funciones de la aplicación | [Funciones principales](#funciones-principales) |
+| Compilar el código | [Ejecutar el proyecto](#ejecutar-el-proyecto) |
+| Instalarla para el personal de una tienda | [Instalarla en los teléfonos](#instalarla-en-los-teléfonos-de-la-tienda) |
+| Configurar la seguridad de los datos | [`firestore.rules`](firestore.rules) |
+
 ## Qué resuelve
 
 Una tienda pequeña puede llevar sus ventas e inventario desde un teléfono Android, sin depender de planillas manuales. La aplicación mantiene el historial de las ventas y actualiza el stock cuando una venta se confirma, se corrige o se anula.
