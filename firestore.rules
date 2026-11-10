@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function authorized() {
+      return signedIn() && exists(/databases/$(database)/documents/authorizedUsers/$(request.auth.uid));
+    }
+
+    match /authorizedUsers/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
+    }
+
+    match /products/{productId} {
+      allow read: if signedIn();
+      allow create, update: if authorized()
+        && request.resource.data.keys().hasOnly(['name', 'barcode', 'price', 'stock', 'minStock', 'active', 'updatedAt'])
+        && request.resource.data.name is string
+        && request.resource.data.barcode is string
+        && request.resource.data.price is int && request.resource.data.price > 0
+        && request.resource.data.stock is int && request.resource.data.stock >= 0
+        && request.resource.data.minStock is int && request.resource.data.minStock >= 0
+        && request.resource.data.active is bool;
+      allow delete: if false;
+    }
+
+    match /sales/{saleId} {
+      allow read: if signedIn();
+      allow create: if authorized()
+        && request.resource.data.keys().hasOnly(['dayKey', 'total', 'lines', 'createdAt', 'userId'])
+        && request.resource.data.dayKey is string
+        && request.resource.data.total is int && request.resource.data.total >= 0
+        && request.resource.data.lines is list && request.resource.data.lines.size() > 0
+        && request.resource.data.userId == request.auth.uid;
+      allow update: if authorized()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lines', 'total', 'updatedAt'])
+        && request.resource.data.lines is list && request.resource.data.lines.size() > 0
+        && request.resource.data.total is int && request.resource.data.total > 0
+        && request.resource.data.dayKey == resource.data.dayKey
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.userId == resource.data.userId;
+      allow delete: if authorized();
+    }
+  }
+}
